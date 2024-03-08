@@ -47,16 +47,30 @@ export class LoginComponent {
     this.loading = true;
 
     if (this.loginForm.invalid) {
-      // Formulaire invalide, marquer tous les champs comme touchés pour afficher les messages d'erreur
       Object.keys(this.loginForm.controls).forEach((field) => {
         const control = this.loginForm.get(field);
         control?.markAsTouched({ onlySelf: true });
       });
-
       this.loading = false;
       return;
     }
 
     const { username, password } = this.loginForm.value;
+
+    // Utiliser le service AuthService pour se connecter
+    this.authService.login(username, password).subscribe({
+      next: (response) => {
+        // Connexion réussie, rediriger vers une autre page
+        console.log(response);
+        this.router.navigate(['/annonces']);
+      },
+      error: (error) => {
+        // Connexion échouée, afficher un message d'erreur
+        console.log(error);
+        this.loginStatusMessage =
+          'Échec de la connexion. Veuillez vérifier votre identifiant et mot de passe.';
+        this.loading = false;
+      },
+    });
   }
 }
